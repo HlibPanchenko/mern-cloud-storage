@@ -1,11 +1,14 @@
 const Router = require("express");
 const User = require("../models/User");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const { check, validationResult } = require("express-validator");
 const router = new Router();
 const authMiddleware = require('../middleware/auth.middleware')
+const fileService = require('../services/fileService')
+const File = require('../models/File')
 
 router.post(
   "/registration",
@@ -42,6 +45,11 @@ router.post(
       const user = new User({ email, password: hashPassword });
       // сохраним пользователя в БД
       await user.save();
+      // При регистрации для каждого пользователя будет создаваться папка,
+      // в которой будут храниться все его файлы. 
+      // после того как пользователь был сохранен в БД, 
+      // создаем для него отдельнуюю папку по названию id этого пользователя
+      await fileService.createDir(new File({user:user.id, name: ''}))
       return res.json({ message: "User was created" });
     } catch (e) {
       console.log(e);
