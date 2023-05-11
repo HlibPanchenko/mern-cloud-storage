@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getFiles } from "../../actions/file";
+import { getFiles, createDir } from "../../actions/file";
 import FileList from "./fileList/FileList";
 import "./disk.scss";
+import Popup from "./Popup";
+import {setPopupDisplay} from "../../reducers/fileReducer";
 
 const Disk = () => {
   const dispatch = useDispatch();
@@ -12,13 +14,19 @@ const Disk = () => {
     dispatch(getFiles(currentDir));
   }, [currentDir]);
 
+  // функция открытия модального окна 
+  function showPopupHandler() {
+	dispatch(setPopupDisplay('flex'))
+}
+
   return (
     <div className="disk">
       <div className="disk__btns">
         <button className="disk__back">Назад</button>
-        <button className="disk__create">Создать папку</button>
+        <button className="disk__create" onClick={() => showPopupHandler()}>Создать папку</button>
       </div>
       <FileList />
+		<Popup/>
     </div>
   );
 };
