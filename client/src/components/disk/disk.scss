@@ -38,3 +38,13 @@
 .popup input {
   margin: 20px 0px;
 }
+
+.disk__upload-input {
+  display: none;
+}
+.disk__upload-label {
+  border: 2px dashed #566885;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 10px;
+}
