@@ -7,6 +7,7 @@ const File = new Schema({
   accessLink: { type: String },
   size: { type: Number, default: 0 },
   path: { type: String, default: "" },
+  date: {type: Date, default: Date.now()},
   user: { type: ObjectId, ref: "User" },
   // user будет ссылаться на пользователя, который добавил файл
   parent: { type: ObjectId, ref: "File" },
