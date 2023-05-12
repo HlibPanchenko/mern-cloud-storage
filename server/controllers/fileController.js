@@ -86,12 +86,16 @@ class FileController {
       file.mv(path);
       // получим расширение файла (нам надо слово после последней точки)
       const type = file.name.split(".").pop();
+      let filePath = file.name;
+      if (parent) {
+        filePath = parent.path + "\\" + file.name;
+      }
       // создадим модель файла которую будем сохранять в БД
       const dbFile = new File({
         name: file.name,
         type,
         size: file.size,
-        path: parent?.path,
+        path: filePath,
         parent: parent?._id,
         user: user._id,
       });
@@ -110,22 +114,46 @@ class FileController {
   // функцию скачивания файлов
   async downloadFile(req, res) {
     try {
-   // получим файл с БД по id файла и пользователя
-        const file = await File.findOne({_id: req.query.id, user: req.user.id})
-   // путь до файла который хранится на сервере 
-   // req.user.id - папка каждого пользователя имеет название в виде его id
-        const path = config.get('filePath') + '\\' + req.user.id + '\\' + file.path + '\\' + file.name
-   // если файл по такому пути существует, то мы отправляем его на клиент 
-        if (fs.existsSync(path)) {
-            return res.download(path, file.name)
-        }
-   // если файл не найден
-        return res.status(400).json({message: "Download error"})
+      // получим файл с БД по id файла и пользователя
+      const file = await File.findOne({ _id: req.query.id, user: req.user.id });
+      // путь до файла который хранится на сервере
+      // req.user.id - папка каждого пользователя имеет название в виде его id
+      const path =
+        config.get("filePath") +
+        "\\" +
+        req.user.id +
+        "\\" +
+        file.path +
+        "\\" +
+        file.name;
+      // если файл по такому пути существует, то мы отправляем его на клиент
+      if (fs.existsSync(path)) {
+        return res.download(path, file.name);
+      }
+      // если файл не найден
+      return res.status(400).json({ message: "Download error" });
     } catch (e) {
-        console.log(e)
-        res.status(500).json({message: "Download error"})
+      console.log(e);
+      res.status(500).json({ message: "Download error" });
     }
-}
+  }
+  // функция удаления файла
+  async deleteFile(req, res) {
+    try {
+      const file = await File.findOne({ _id: req.query.id, user: req.user.id });
+      if (!file) {
+        return res.status(400).json({ message: "file not found" });
+      }
+      // удалим физический файл на сервере
+      fileService.deleteFile(file);
+      // удаляем модель файла из БД
+      await file.deleteOne();
+      return res.json({ message: "File was deleted" });
+    } catch (e) {
+      console.log(e);
+      return res.status(400).json({ message: "Dir is not empty" });
+    }
+  }
 }
 
 module.exports = new FileController();

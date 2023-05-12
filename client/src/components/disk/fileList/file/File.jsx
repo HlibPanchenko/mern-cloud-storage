@@ -4,7 +4,7 @@ import dirLogo from "../../../../assets/img/dir.svg";
 import fileLogo from "../../../../assets/img/file.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { pushToStack, setCurrentDir } from "../../../../reducers/fileReducer";
-import { downloadFile } from "../../../../actions/file";
+import { downloadFile, deleteFile } from "../../../../actions/file";
 
 const File = ({ file }) => {
   const dispatch = useDispatch();
@@ -27,6 +27,12 @@ const File = ({ file }) => {
     downloadFile(file);
   }
 
+  // удалить файл
+  function deleteClickHandler(e) {
+    e.stopPropagation();
+    dispatch(deleteFile(file));
+  }
+
   return (
     // функия открытия папки будет работать только если нажали на папку
     <div className="file" onClick={() => openDirHandler()}>
@@ -46,7 +52,12 @@ const File = ({ file }) => {
           download
         </button>
       )}
-      <button className="file__btn file__delete">delete</button>
+      <button
+        className="file__btn file__delete"
+        onClick={(e) => deleteClickHandler(e)}
+      >
+        delete
+      </button>
     </div>
   );
 };

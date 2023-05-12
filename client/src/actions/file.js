@@ -1,6 +1,6 @@
 // функцию получения файлов с сервера
 import axios from "axios";
-import { setFiles, addFile } from "../reducers/fileReducer";
+import { setFiles, addFile, deleteFileAction } from "../reducers/fileReducer";
 
 // передаем id текущей директории
 export function getFiles(dirId) {
@@ -86,7 +86,7 @@ export function uploadFile(file, dirId) {
       // диспатчим в редакс
       dispatch(addFile(response.data));
     } catch (e) {
-      alert(e.response.data.message);
+      alert(e?.response?.data?.message)
     }
   };
 }
@@ -110,5 +110,23 @@ export async function downloadFile(file) {
       // имитируем нажатие пользователя на эту ссылку 
       link.click()
       link.remove()
+  }
+}
+
+// функцию для удаления файлов.
+export function deleteFile(file) {
+  return async dispatch => {
+      try {
+          const response = await axios.delete(`http://localhost:5000/api/files?id=${file._id}`,{
+              headers:{
+                  Authorization: `Bearer ${localStorage.getItem('token')}`
+              }
+          })
+          // deleteFileAction - наша функция с редюсера
+          dispatch(deleteFileAction(file._id))
+          alert(response.data.message)
+      } catch (e) {
+          alert(e?.response?.data?.message)
+      }
   }
 }
