@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getFiles, createDir, uploadFile } from "../../actions/file";
 import FileList from "./fileList/FileList";
@@ -12,6 +12,8 @@ const Disk = () => {
   // Каждый раз, когда мы открываем папку, мы будем закидывать ее id
   // в массив dirStack. Таким образом у нас будет путь папок.
   const dirStack = useSelector((state) => state.files.dirStack);
+  // отображает перетянуты ли уже какие-то файлы
+  const [dragEnter, setDragEnter] = useState(false);
 
   useEffect(() => {
     dispatch(getFiles(currentDir));
@@ -32,14 +34,42 @@ const Disk = () => {
 
   // вызывается при выборе файлов в input
   function fileUploadHandler(event) {
-  // в массив прокинем список файлов из input
-	const files = [...event.target.files]
-  // для каждого из этих файлов вызовем функцию загрузки 
-	files.forEach(file => dispatch(uploadFile(file, currentDir)))
-}
+    // в массив прокинем список файлов из input
+    const files = [...event.target.files];
+    // для каждого из этих файлов вызовем функцию загрузки
+    files.forEach((file) => dispatch(uploadFile(file, currentDir)));
+  }
 
-  return (
-    <div className="disk">
+  // определяет занесли ли мы файл в область
+  function dragEnterHandler(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragEnter(true);
+  }
+  // определяет вышли ли мы из этой области
+  function dragLeaveHandler(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragEnter(false);
+  }
+
+  // загрузка файлов
+  function dropHandler(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    let files = [...event.dataTransfer.files];
+    // отправим файлы на сервер 
+    files.forEach((file) => dispatch(uploadFile(file, currentDir)));
+    setDragEnter(false);
+  }
+
+  return !dragEnter ? (
+    <div
+      className="disk"
+      onDragEnter={dragEnterHandler}
+      onDragLeave={dragLeaveHandler}
+      onDragOver={dragEnterHandler}
+    >
       <div className="disk__btns">
         <button className="disk__back" onClick={() => backClickHandler()}>
           Назад
@@ -62,6 +92,16 @@ const Disk = () => {
       </div>
       <FileList />
       <Popup />
+    </div>
+  ) : (
+    <div
+      className="drop-area"
+      onDrop={dropHandler}
+      onDragEnter={dragEnterHandler}
+      onDragLeave={dragLeaveHandler}
+      onDragOver={dragEnterHandler}
+    >
+      Перетащите файлы сюда
     </div>
   );
 };
