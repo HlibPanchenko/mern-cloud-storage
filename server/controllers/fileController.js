@@ -106,6 +106,26 @@ class FileController {
       return res.status(500).json({ message: "Upload error" });
     }
   }
+
+  // функцию скачивания файлов
+  async downloadFile(req, res) {
+    try {
+   // получим файл с БД по id файла и пользователя
+        const file = await File.findOne({_id: req.query.id, user: req.user.id})
+   // путь до файла который хранится на сервере 
+   // req.user.id - папка каждого пользователя имеет название в виде его id
+        const path = config.get('filePath') + '\\' + req.user.id + '\\' + file.path + '\\' + file.name
+   // если файл по такому пути существует, то мы отправляем его на клиент 
+        if (fs.existsSync(path)) {
+            return res.download(path, file.name)
+        }
+   // если файл не найден
+        return res.status(400).json({message: "Download error"})
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({message: "Download error"})
+    }
+}
 }
 
 module.exports = new FileController();

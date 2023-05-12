@@ -42,6 +42,7 @@ export function createDir(dirId, name) {
   };
 }
 
+// функция для загрузки файла
 export function uploadFile(file, dirId) {
   return async (dispatch) => {
     try {
@@ -88,4 +89,26 @@ export function uploadFile(file, dirId) {
       alert(e.response.data.message);
     }
   };
+}
+
+// функцию для скачивания файла
+export async function downloadFile(file) {
+  const response = await fetch(`http://localhost:5000/api/files/download?id=${file._id}`,{
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+  })
+  if (response.status === 200) {
+    // blob это подобный физическому файлу объект 
+      const blob = await response.blob()
+    // из этого blob создадим url
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = file.name
+      document.body.appendChild(link)
+      // имитируем нажатие пользователя на эту ссылку 
+      link.click()
+      link.remove()
+  }
 }
