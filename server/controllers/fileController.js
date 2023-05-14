@@ -38,11 +38,42 @@ class FileController {
   // получение файлов
   async getFiles(req, res) {
     try {
-      // ищем файлы по id пользователя и id родительской папки
-      const files = await File.find({
-        user: req.user.id,
-        parent: req.query.parent,
-      });
+      // сортировка
+      // так как это get запрос, будем передавать информацию в строке запроса
+      const { sort } = req.query;
+      let files;
+      switch (sort) {
+        case "name":
+          files = await File.find({
+            user: req.user.id,
+            parent: req.query.parent,
+          }).sort({ name: 1 });
+          break;
+        case "type":
+          files = await File.find({
+            user: req.user.id,
+            parent: req.query.parent,
+          }).sort({ type: 1 });
+          break;
+        case "date":
+          files = await File.find({
+            user: req.user.id,
+            parent: req.query.parent,
+          }).sort({ date: 1 });
+          break;
+        default:
+          // ищем файлы по id пользователя и id родительской папки
+          files = await File.find({
+            user: req.user.id,
+            parent: req.query.parent,
+          });
+          break;
+      }
+      // Вариант без сортировки когда мы просто возвращали все файлы
+      // const files = await File.find({
+      //   user: req.user.id,
+      //   parent: req.query.parent,
+      // });
       return res.json(files);
     } catch (e) {
       console.log(e);

@@ -15,10 +15,11 @@ const Disk = () => {
   const dirStack = useSelector((state) => state.files.dirStack);
   // отображает перетянуты ли уже какие-то файлы
   const [dragEnter, setDragEnter] = useState(false);
+  const [sort, setSort] = useState('type')
 
   useEffect(() => {
-    dispatch(getFiles(currentDir));
-  }, [currentDir]);
+    dispatch(getFiles(currentDir, sort));
+  }, [currentDir, sort]);
 
   // функция открытия модального окна
   function showPopupHandler() {
@@ -59,7 +60,7 @@ const Disk = () => {
     event.preventDefault();
     event.stopPropagation();
     let files = [...event.dataTransfer.files];
-    // отправим файлы на сервер 
+    // отправим файлы на сервер
     files.forEach((file) => dispatch(uploadFile(file, currentDir)));
     setDragEnter(false);
   }
@@ -90,10 +91,19 @@ const Disk = () => {
             className="disk__upload-input"
           />
         </div>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="disk__select"
+        >
+          <option value="name">По имени</option>
+          <option value="type">По типу</option>
+          <option value="date">По дате</option>
+        </select>
       </div>
       <FileList />
       <Popup />
-      <Uploader/>
+      <Uploader />
     </div>
   ) : (
     <div
