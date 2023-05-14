@@ -10,6 +10,7 @@ import Uploader from "./uploader/Uploader";
 const Disk = () => {
   const dispatch = useDispatch();
   const currentDir = useSelector((state) => state.files.currentDir);
+  const loader = useSelector(state => state.app.loader)
   // Каждый раз, когда мы открываем папку, мы будем закидывать ее id
   // в массив dirStack. Таким образом у нас будет путь папок.
   const dirStack = useSelector((state) => state.files.dirStack);
@@ -64,6 +65,14 @@ const Disk = () => {
     files.forEach((file) => dispatch(uploadFile(file, currentDir)));
     setDragEnter(false);
   }
+
+  if(loader) {
+    return (
+        <div className="loader">
+            <div className="lds-dual-ring"></div>
+        </div>
+    )
+}
 
   return !dragEnter ? (
     <div

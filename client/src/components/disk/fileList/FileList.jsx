@@ -9,6 +9,10 @@ const FileList = () => {
     <File key={file._id} file={file} />
   ));
 
+  if (files.length === 0) {
+    return <div className="loader">Файлы не найдены</div>;
+  }
+  
   return (
     <div className="filelist">
       <div className="filelist__header">
