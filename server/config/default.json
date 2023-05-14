@@ -2,5 +2,6 @@
   "serverPort": 5000,
   "dbUrl": "mongodb+srv://glebpanchenk7:jgwj7kYb2ZbFY9XQ@cloud.nwobqez.mongodb.net/?retryWrites=true&w=majority",
   "secretKey": "mern-secket-key",
-  "filePath": "C:\\Users\\Глеб\\Desktop\\Frontend\\node js\\mern-cloud-storage (course)\\mern-cloud-storage\\server\\files"
+  "filePath": "C:\\Users\\Глеб\\Desktop\\Frontend\\node js\\mern-cloud-storage (course)\\mern-cloud-storage\\server\\files",
+  "staticPath": "C:\\Users\\Глеб\\Desktop\\Frontend\\node js\\mern-cloud-storage (course)\\mern-cloud-storage\\server\\static"
 }

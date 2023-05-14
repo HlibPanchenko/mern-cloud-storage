@@ -16,6 +16,7 @@ const corsMiddleware = require("./middleware/cors.middleware");
 app.use(fileUpload({}))
 app.use(corsMiddleware);
 app.use(express.json());
+app.use(express.static('static'))
 app.use("/api/auth", authRouter);
 app.use("/api/files", fileRouter)
 

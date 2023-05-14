@@ -3,6 +3,7 @@ const User = require("../models/User");
 const File = require("../models/File");
 const config = require("config");
 const fs = require("fs");
+const Uuid = require("uuid");
 
 class FileController {
   async createDir(req, res) {
@@ -157,7 +158,7 @@ class FileController {
       //   file.path +
       //   "\\" +
       //   file.name;
-      const path = fileService.getPath(file)
+      const path = fileService.getPath(file);
       // если файл по такому пути существует, то мы отправляем его на клиент
       if (fs.existsSync(path)) {
         return res.download(path, file.name);
@@ -189,14 +190,51 @@ class FileController {
 
   async searchFile(req, res) {
     try {
-        const searchName = req.query.search
-        // сначала получим все файлы которые есть у пользователя
-        let files = await File.find({user: req.user.id})
-        files = files.filter(file => file.name.includes(searchName))
-        return res.json(files)
+      const searchName = req.query.search;
+      // сначала получим все файлы которые есть у пользователя
+      let files = await File.find({ user: req.user.id });
+      files = files.filter((file) => file.name.includes(searchName));
+      return res.json(files);
+    } catch (e) {
+      console.log(e);
+      return res.status(400).json({ message: "Search error" });
+    }
+  }
+  // функция загрузки аватара
+  async uploadAvatar(req, res) {
+    try {
+      // получаем файл (аватарку) из запроса
+      const file = req.files.file;
+      // получим самого пользователя из БД
+      // этот id пользователя мы получаем из токена
+      const user = await User.findById(req.user.id);
+      // генерируем рандомное название для файла - модуль uuid
+      const avatarName = Uuid.v4() + ".jpg";
+      // перемещаем файл 
+      file.mv(config.get("staticPath") + "\\" + avatarName);
+      // в модель пользователя добавим название аватарки
+      user.avatar = avatarName;
+      // сохраняем пользователя
+      await user.save();
+      return res.json({ message: "Avatar was uploaded" });
+    } catch (e) {
+      console.log(e);
+      return res.status(400).json({ message: "Upload avatar error" });
+    }
+  }
+
+  // удаление аватарки
+  async deleteAvatar(req, res) {
+    try {
+        const user = await User.findById(req.user.id)
+    // удаляем физический файл с компа
+        fs.unlinkSync(config.get('staticPath') + "\\" + user.avatar)
+        user.avatar = null
+        await user.save()
+        return res.json(user)
     } catch (e) {
         console.log(e)
-        return res.status(400).json({message: 'Search error'})
+        return res.status(400).json({message: 'Delete avatar error'})
     }
 }
 }
