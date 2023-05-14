@@ -4,19 +4,23 @@ import { getFiles, createDir, uploadFile } from "../../actions/file";
 import FileList from "./fileList/FileList";
 import "./disk.scss";
 import Popup from "./Popup";
-import { setPopupDisplay, setCurrentDir } from "../../reducers/fileReducer";
+import {
+  setCurrentDir,
+  setFileView,
+  setPopupDisplay,
+} from "../../reducers/fileReducer";
 import Uploader from "./uploader/Uploader";
 
 const Disk = () => {
   const dispatch = useDispatch();
   const currentDir = useSelector((state) => state.files.currentDir);
-  const loader = useSelector(state => state.app.loader)
+  const loader = useSelector((state) => state.app.loader);
   // Каждый раз, когда мы открываем папку, мы будем закидывать ее id
   // в массив dirStack. Таким образом у нас будет путь папок.
   const dirStack = useSelector((state) => state.files.dirStack);
   // отображает перетянуты ли уже какие-то файлы
   const [dragEnter, setDragEnter] = useState(false);
-  const [sort, setSort] = useState('type')
+  const [sort, setSort] = useState("type");
 
   useEffect(() => {
     dispatch(getFiles(currentDir, sort));
@@ -66,13 +70,13 @@ const Disk = () => {
     setDragEnter(false);
   }
 
-  if(loader) {
+  if (loader) {
     return (
-        <div className="loader">
-            <div className="lds-dual-ring"></div>
-        </div>
-    )
-}
+      <div className="loader">
+        <div className="lds-dual-ring"></div>
+      </div>
+    );
+  }
 
   return !dragEnter ? (
     <div
@@ -109,6 +113,14 @@ const Disk = () => {
           <option value="type">По типу</option>
           <option value="date">По дате</option>
         </select>
+        <button
+          className="disk__plate"
+          onClick={() => dispatch(setFileView("plate"))}
+        />
+        <button
+          className="disk__list"
+          onClick={() => dispatch(setFileView("list"))}
+        />
       </div>
       <FileList />
       <Popup />
